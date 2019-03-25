@@ -1,0 +1,3 @@
+# pip install -r requirements.txt
+redis==2.10.5
+pyfiglet==0.7.5

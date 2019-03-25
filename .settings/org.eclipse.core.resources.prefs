@@ -1,0 +1,13 @@
+eclipse.preferences.version=1
+encoding//dev/devsocket.py=utf-8
+encoding//dev/negotiation.py=utf-8
+encoding//dev/parsers.py=utf-8
+encoding//dev/photosocket.py=utf-8
+encoding//web/devheartbeat.py=utf-8
+encoding//web/hsredis.py=utf-8
+encoding//web/negotiation.py=utf-8
+encoding//web/parsers.py=utf-8
+encoding/crc.py=utf-8
+encoding/main.py=utf-8
+encoding/redismsger.py=utf-8
+encoding/settings.py=utf-8
