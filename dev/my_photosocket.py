@@ -57,42 +57,45 @@ class PhotoSocket(threading.Thread):
                 print 'receive ing...'
                 break
 
-            # 获取数据
-            data_list = []
-            while True:
-                data = self._tcpCliSock.recv(1024)
-                data = data.encode('hex')
-                data_list.append(data)
-                if data[-6:-4] == '03':
-                    break
+            # self.local_test()
+            self.deal_data()
 
-            data_list = sorted(data_list, key=lambda x: int(x[31:34], 16))
-            self.write_data(data_list)
-
-            # photo_data = []
-            for data in data_list:
-                if not self.connect_state:
-                    time.sleep(1)
-                    continue
-                if not data:
-                    self.setConnectState(False)
-                    print u'!!!通讯服务器主动断开连接'
-                    # 当无法从服务器接受TCP消息时则会一直尝试获取TCP消息
-                    continue
-
-                function_code = self._get_function_code(data)
-
-                if function_code != 54:
-                    print u'数据包功能码无效: %s' % (function_code)
-
-                parser = ParsePhoto()
-                result = parser.parse(data)
-                photo_data.append(result)
-                if result is None:
-                    print u'数据包crc无效：%s' % (self._get_hexstr(data))
-                    continue
-
-            self._write_to_picture(photo_data)
+            # # 获取数据
+            # data_list = []
+            # while True:
+            #     data = self._tcpCliSock.recv(1024)
+            #     data = data.encode('hex')
+            #     data_list.append(data)
+            #     if data[-6:-4] == '03':
+            #         break
+            #
+            # data_list = sorted(data_list, key=lambda x: int(x[31:34], 16))
+            # self.write_data(data_list)
+            #
+            # # photo_data = []
+            # for data in data_list:
+            #     if not self.connect_state:
+            #         time.sleep(1)
+            #         continue
+            #     if not data:
+            #         self.setConnectState(False)
+            #         print u'!!!通讯服务器主动断开连接'
+            #         # 当无法从服务器接受TCP消息时则会一直尝试获取TCP消息
+            #         continue
+            #
+            #     function_code = self._get_function_code(data)
+            #
+            #     if function_code != 54:
+            #         print u'数据包功能码无效: %s' % (function_code)
+            #
+            #     parser = ParsePhoto()
+            #     result = parser.parse(data)
+            #     photo_data.append(result)
+            #     if result is None:
+            #         print u'数据包crc无效：%s' % (self._get_hexstr(data))
+            #         continue
+            #
+            # self._write_to_picture(photo_data)
 
 
             # for data in Converter.get_data_lst():
@@ -149,9 +152,11 @@ class PhotoSocket(threading.Thread):
         date = current_time[2:4] + current_time[5:7] + current_time[8:10]
         hour = current_time[11:13] + current_time[14:16] + current_time[17:19]
         date = date + hour
-        print 'date', date
+        # print 'date', date
         instruction = '7E7E0010000473160000368008020001' + date + '05'
+        print instruction
         instruction = get_crc16(instruction)
+        print instruction
         return instruction.decode('hex')
 
     def listen(self):
@@ -183,13 +188,13 @@ class PhotoSocket(threading.Thread):
         hexstr = data
         # 取出功能码
         function_code = hexstr[20:22]
-        print 'function_code', function_code
+        # print 'function_code', function_code
         return int(function_code, 16)
 
     def _write_to_picture(self, data):
         datas = sorted(data, key=lambda x: x['current_order'])
         try:
-            with open('test2.jpg', 'wb') as f:
+            with open('test2.gif', 'wb') as f:
                 for data in datas:
                     f.write(data['data'].decode('hex'))
         except Exception as e:
@@ -197,9 +202,84 @@ class PhotoSocket(threading.Thread):
 
     def write_data(self, datas):
         try:
-            with open('data_list.txt', 'w') as f:
+            from random import randint
+            a = randint(1, 10000)
+            a = str(a) + '.txt'
+            with open(a, 'w') as f:
                 for data in datas:
                     f.write(data + '\n')
         except Exception as e:
             print u'写入文件时错误:%s' % (e.message)
+
+    def local_test(self):
+        photo_data = []
+        for data in Converter.get_data_lst():
+            if not self.connect_state:
+                time.sleep(1)
+                continue
+            try:
+                # data = self._tcpCliSock.recv(1024)
+                # 生产环境中的数据包都是没有空格符的
+                # data = data.encode('hex')
+
+                if not data:
+                    self.setConnectState(False)
+                    print u'!!!通讯服务器主动断开连接'
+                    # 当无法从服务器接受TCP消息时则会一直尝试获取TCP消息
+                    continue
+
+                function_code = self._get_function_code(data)
+
+                if function_code != 54:
+                    print u'数据包功能码无效: %s' % (function_code)
+
+                parser = ParsePhoto()
+                result = parser.parse(data)
+                photo_data.append(result)
+                if result is None:
+                    print u'数据包crc无效：%s' % (self._get_hexstr(data))
+                    continue
+
+            except Exception, e:
+                print u'!!!devsocket run: %s ' % e.message
+
+        self._write_to_picture(photo_data)
+
+    def deal_data(self): # 实时处理图片数据
+        # 获取数据
+        data_list = []
+        while True:
+            data = self._tcpCliSock.recv(1024)
+            data = data.encode('hex')
+            data_list.append(data)
+            if data[-6:-4] == '03':
+                break
+
+        data_list = sorted(data_list, key=lambda x: int(x[31:34], 16))
+        self.write_data(data_list)
+
+        photo_data = []
+        for data in data_list:
+            if not self.connect_state:
+                time.sleep(1)
+                continue
+            if not data:
+                self.setConnectState(False)
+                print u'!!!通讯服务器主动断开连接'
+                # 当无法从服务器接受TCP消息时则会一直尝试获取TCP消息
+                continue
+
+            function_code = self._get_function_code(data)
+
+            if function_code != 54:
+                print u'数据包功能码无效: %s' % (function_code)
+
+            parser = ParsePhoto()
+            result = parser.parse(data)
+            photo_data.append(result)
+            if result is None:
+                print u'数据包crc无效：%s' % (self._get_hexstr(data))
+                continue
+
+        self._write_to_picture(photo_data)
 

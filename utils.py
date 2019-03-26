@@ -41,7 +41,7 @@ class Converter():
         :return: data of list
         """
         res = ''
-        with open('photodata.txt', 'r') as f:
+        with open('7305.txt', 'r') as f:
             global res
             res = f.read()
         pattern = re.compile(r'7e7e[\w]+')
@@ -50,7 +50,7 @@ class Converter():
 
 if __name__ == '__main__':
     res = ''
-    with open('photodata.txt', 'r') as f:
+    with open('7305.txt', 'r') as f:
         global res
         res = f.read()
     pattern = re.compile(r'7e7e[\w]+')
