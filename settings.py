@@ -13,11 +13,18 @@ DEFAULTS = {
     'DEDIS_PORT': 6379,
     'DEVICE_SOFT_HOST': '127.0.0.1',
     'DEVICE_SOFT_PORT': 5005,
+
     'PHOTO_SOFT_HOST': '116.230.245.212',
-    # 'PHOTO_SOFT_HOST': '192.168.102.217',
-    # 'PHOTO_SOFT_PORT': 5008,
-    'PHOTO_SOFT_PORT': 8090,
+    # 'PHOTO_SOFT_HOST': 'localhost',
+    # 'PHOTO_SOFT_PORT': 6999,
+    'PHOTO_SOFT_PORT': 51003,
+
     'HEARTBEAT': 5,
+
+    # 获取站点信息的host和port
+    'STATION_HOST': '127.0.0.1',
+    'STATION_PORT': '8000'
+
 
 }
 

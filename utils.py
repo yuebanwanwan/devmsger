@@ -41,7 +41,7 @@ class Converter():
         :return: data of list
         """
         res = ''
-        with open('7305.txt', 'r') as f:
+        with open('47986.txt', 'r') as f:
             global res
             res = f.read()
         pattern = re.compile(r'7e7e[\w]+')
